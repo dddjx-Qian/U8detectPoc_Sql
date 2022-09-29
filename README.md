@@ -3,7 +3,7 @@
 对于用友 U8 OA test.jsp文件存在 SQL注入漏洞,进行脚本化检测POC
 
 
-![image](https://user-images.githubusercontent.com/103556327/192997805-6d6bab8a-8640-4c45-9e78-deedaa85478e.png)
+![54a0f28294bd422fa6a3db0f8e1b58b](https://user-images.githubusercontent.com/103556327/192998813-de8a659b-732e-4019-9dd5-ea47adff1010.jpg)
 
 ```
 -h / --help使用帮助参数
